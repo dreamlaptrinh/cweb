@@ -24,7 +24,7 @@ export const getDetail = async(req, res) =>{
             return res.status(404).json({message:"Khong tim thay san pham"});
         }
         return res.status(200).json({
-            message:"Tao san pham thanh cong", 
+            message:"Tim thay san pham thanh cong", 
             data: product
     });
     } catch (error) {
