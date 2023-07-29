@@ -1,11 +1,13 @@
+import Category from '../models/Category.js';
 import Product from '../models/product.js';
+
 import { productValid } from '../validation/product.js';
 
 
 export const getAll = async(req, res) =>{
     try {
-        const products = await Product.find();
-        if (products.length === 0){
+        const products = await Product.find({}).populate("categoryId")
+        if (!products && products.length === 0){
             return res.status(404).json({message:"Khong tim thay san pham"});
         }
         return res.status(200).json({
@@ -19,7 +21,7 @@ export const getAll = async(req, res) =>{
 
 export const getDetail = async(req, res) =>{
     try {
-        const product = await Product.findById(req.params.id);
+        const product = await Product.findById(req.params.id).populate("categoryId")
         if (!product === 0){
             return res.status(404).json({message:"Khong tim thay san pham"});
         }
@@ -43,9 +45,19 @@ export const create = async(req, res) =>{
         if(!product){
             return res.status(404).json({message:"Tao san pham khong thanh cong"});
         }
+
+        const updateCategory = await Category.findByIdAndUpdate(product.categoryId,{
+            $addToSet:{
+                data: product._id,
+            }
+        })
+        if(!updateCategory){
+            return res.status(500).json({message:"updateCategory failed"})
+        }
+
         return res.status(200).json({
             message:"Tao san pham thanh cong", 
-            data: product
+            products: product
     });
     } catch (error) {
         return res.status(500).json({message : error});
